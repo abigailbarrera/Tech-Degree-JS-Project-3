@@ -18,6 +18,7 @@ const designMenu = document.querySelector('select[name="user_design"]');
 const colorDiv = document.querySelector('#colors-js-puns');
 const colorMenu = document.querySelector('select[id="color"]');
 const colors = colorMenu.children;
+var locEmail = document.querySelector('.email')
 
 document.getElementById("name").focus();
 
@@ -174,23 +175,58 @@ document.querySelector(".activities").addEventListener("change", function(){
 	}
 });
 
-document.getElementById("payment options").addEventListener("change", function(){
-	var paymentOption = document.getElementById('payment');
-	var paymentSelection = paymentOption.value;
-	var container = document.getElementById('payment-container');
+function defaultPayment() {
+    const choices = paymentMenu.children;
+    choices[1].selected = true;
+    paypalDiv.style.display = 'none';
+    bitcoinDiv.style.display = 'none';
+}
 
+defaultPayment();
+document.getElementById("payment options").addEventListener("change", () => {
+	const pay = event.target;
 	// "Credit Card" payment option isselected by default so display of the #credit-card div...
 	// hide the "Paypal" and "Bitcoin information.
-	if(paymentSelection === "credit card") {
-
-	} else if(paymentSelection === "paypal") {
+	if(pay.value === "credit card") {
+		ccDiv.style.display = '';
+		paypalDiv.style.display = "none";
+		bitcoinDiv.style.display = "none";
+	} else if(pay.value === "paypal") {
 		// If user selects the "PayPal" payment option, display the Paypal information, and hide the credit card + Bitcoin
-		container.innerHTML =  "<div><p>If you selected the PayPal option we'll take you to Paypal's site to set up your billing information, when you click 'Register' below.</p></div>";
-
-	} else if(paymentSelection === "bitcoin") {
+		ccDiv.style.display = 'none';
+		paypalDiv.style.display = "";
+		bitcoinDiv.style.display = "none";
+	} else if(pay.value === "bitcoin") {
 		/// If user selects the "Bitcoin" payment option, display the Bitcoin information, and hide the credit card + paypal.
-		container.innerHTML = "<div><p>If you selected the Bitcoin option we'll take you to the Coinbase site to set up your billing information. Due to the nature of exchanging Bitcoin, all Bitcoin transactions will be final.</p></div>";
+		ccDiv.style.display = 'none';
+		paypalDiv.style.display = "none";
+		bitcoinDiv.style.display = "";
 	}
+
+	submit.addEventListener('click', (e) => {
+		const ccNum = ccNumField.value;
+    	const zip = zipField.value;
+    	const cvv = cvvField.value;
+		if (pay.value === "credit card" && isNaN(ccNum) || ccNum.length < 13 || ccNum.length > 16) {
+	        ccNumField.className = 'error';
+	        e.preventDefault();
+	    } else {
+			ccNumField.className = '';
+	    }
+	    if (pay.value === "credit card" && isNaN(zip) || zip.length !== 5) {
+	        e.preventDefault();
+	        zipField.className = 'error';
+	    } else {
+	        zipField.className = '';
+	    }
+	    if (pay.value === "credit card" && isNaN(cvv) || cvv.length !== 3) {
+	        e.preventDefault();
+	        cvvField.className = 'error';
+	    } else {
+	        cvvField.className = '';
+	    }
+
+	});
 });
 
 //  When form is submitted, field values are checked
@@ -199,9 +235,7 @@ submit.addEventListener('click', (e) => {
     const name = nameField.value;
     var nameLabel = document.getElementById("nameLabel");
     const email = emailField.value;
-    const ccNum = ccNumField.value;
-    const zip = zipField.value;
-    const cvv = cvvField.value;
+
     if (name === '') {
         nameField.className = 'error';
         e.preventDefault();
@@ -215,25 +249,7 @@ submit.addEventListener('click', (e) => {
     } else {
     	emailField.className = '';
     }
-    if (isNaN(ccNum) || ccNum.length < 13 || ccNum.length > 16) {
-        ccNumField.className = 'error';
-        e.preventDefault();
-    } else {
-		ccNumField.className = '';
-    }
-    if (isNaN(zip) || zip.length !== 5) {
-        e.preventDefault();
-        zipField.className = 'error';
-    } else {
-        zipField.className = '';
-    }
-    if (isNaN(cvv) || cvv.length !== 3) {
-        e.preventDefault();
-        cvvField.className = 'error';
-    } else {
-        cvvField.className = '';
 
-    }
     var activities = document.getElementsByClassName("activity");
     var counter = 0;
     var activityReminder = document.getElementById("activityReminder");
@@ -271,16 +287,16 @@ emailField.addEventListener('keyup', () => {
 //  Functions to add and remove custom error messages
 function errorMessage(location, message) {
     const msgSpan = document.createElement('span');
-    if (location.firstElementChild) {
-        location.firstElementChild.remove();
+    if (locEmail.firstElementChild) {
+        locEmail.firstElementChild.remove();
     }
     msgSpan.className = 'errorMsg';
     msgSpan.innerText = message;
-    location.appendChild(msgSpan);
+    locEmail.appendChild(msgSpan);
 }
 
 function removeError(location) {
-    if (location.firstElementChild) {
-        location.firstElementChild.remove();
+    if (locEmail.firstElementChild) {
+        locEmail.firstElementChild.remove();
     }
 }
