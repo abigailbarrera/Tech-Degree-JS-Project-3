@@ -18,31 +18,29 @@ const designMenu = document.querySelector('select[name="user_design"]');
 const colorDiv = document.querySelector('#colors-js-puns');
 const colorMenu = document.querySelector('select[id="color"]');
 const colors = colorMenu.children;
-var locEmail = document.querySelector('.email')
+var locEmail = document.querySelector('.email');
+var otherField = document.getElementById('other-title');
+var otherFieldLabel = document.getElementById('other-title-label');
+
 
 document.getElementById("name").focus();
 
-document.getElementById("title").addEventListener("change", function(){
-	var basicSection = document.querySelector('.basic');
-	var jobSelected = jobRole.value;
+otherFieldLabel.style.display = 'none';
+otherField.style.display = 'none';
 
-	if(jobSelected === 'other' ) {
-		var otherText = document.createElement('input');
-		// Add an text input field. Use the id of "other-title"
-		otherText.setAttribute('id', 'other-job');
-		otherText.setAttribute('type', 'text');
-		otherText.setAttribute('name', 'other_text');
-		otherText.setAttribute('placeholder', 'Your Job Role');
-
-		basicSection.appendChild(otherText);
-	}
-
-	if(jobSelected !== 'other'){
-		if(document.getElementById("other-job")) {
-			basicSection.removeChild(document.getElementById("other-title"));
+document.addEventListener('DOMContentLoaded', function() {
+	function onJobChange(event) {
+		if (event.target.value === 'other') {
+			otherField.style.display = 'block';
+			otherFieldLabel.style.display = 'block';
+		} else {
+			otherField.style.display = 'none';
+			otherFieldLabel.style.display = 'none';
 		}
 	}
-});
+document.querySelector('select[name="user_title"]').addEventListener('change', onJobChange);
+})
+
 
 colorDiv.style.display = 'none';
 designMenu.addEventListener('change', (event) => {
@@ -202,39 +200,14 @@ document.getElementById("payment options").addEventListener("change", () => {
 		paypalDiv.style.display = "none";
 		bitcoinDiv.style.display = "";
 	}
-
-	submit.addEventListener('click', (e) => {
-		const ccNum = ccNumField.value;
-    	const zip = zipField.value;
-    	const cvv = cvvField.value;
-		if (pay.value === "credit card" && isNaN(ccNum) || ccNum.length < 13 || ccNum.length > 16) {
-	        ccNumField.className = 'error';
-	        e.preventDefault();
-	    } else {
-			ccNumField.className = '';
-	    }
-	    if (pay.value === "credit card" && isNaN(zip) || zip.length !== 5) {
-	        e.preventDefault();
-	        zipField.className = 'error';
-	    } else {
-	        zipField.className = '';
-	    }
-	    if (pay.value === "credit card" && isNaN(cvv) || cvv.length !== 3) {
-	        e.preventDefault();
-	        cvvField.className = 'error';
-	    } else {
-	        cvvField.className = '';
-	    }
-
-	});
 });
 
-//  When form is submitted, field values are checked
-//  and error messages or indications are presented
+
 submit.addEventListener('click', (e) => {
     const name = nameField.value;
     var nameLabel = document.getElementById("nameLabel");
     const email = emailField.value;
+    const ccNum = ccNumField.value;
 
     if (name === '') {
         nameField.className = 'error';
@@ -249,6 +222,43 @@ submit.addEventListener('click', (e) => {
     } else {
     	emailField.className = '';
     }
+
+    if (paymentMenu.value === 'credit card') {
+        if (isNaN(ccNum) || ccNum.length < 13 || ccNum.length > 16) {
+            e.preventDefault();
+            ccNumField.className = 'error';
+        } else {
+            ccNumField.className = '';
+        }
+    }
+
+    if (paymentMenu.value === 'paypal') {
+    	return true;
+    }
+    if (paymentMenu.value === 'bitcoin') {
+    	return true;
+    }
+
+    //check there's a zip code
+	var zip = document.getElementById("zip");
+    var zipLbl = document.getElementById("zipLbl");
+	if(zip.value.length !== 5) {
+		e.preventDefault();
+        zipField.className = 'error';
+    } else {
+        zipField.className = ''
+    }
+
+    //check there's a cvv
+	var cvv = document.getElementById("cvv");
+    var cvvLbl = document.getElementById("cvvLbl");
+	if(cvv.value.length !== 3) {
+        cvvField.className = 'error';
+        e.preventDefault();
+    } else {
+        cvvField.className = ''
+    }
+
 
     var activities = document.getElementsByClassName("activity");
     var counter = 0;
@@ -272,6 +282,7 @@ submit.addEventListener('click', (e) => {
     }
 });
 
+
 emailField.addEventListener('keyup', () => {
     const email = emailField.value;
     if (email.indexOf('@') === -1 || email.indexOf('.') === -1) {
@@ -287,16 +298,16 @@ emailField.addEventListener('keyup', () => {
 //  Functions to add and remove custom error messages
 function errorMessage(location, message) {
     const msgSpan = document.createElement('span');
-    if (locEmail.firstElementChild) {
-        locEmail.firstElementChild.remove();
+    if (location.firstElementChild) {
+        location.firstElementChild.remove();
     }
     msgSpan.className = 'errorMsg';
     msgSpan.innerText = message;
-    locEmail.appendChild(msgSpan);
+    location.appendChild(msgSpan);
 }
 
 function removeError(location) {
-    if (locEmail.firstElementChild) {
-        locEmail.firstElementChild.remove();
+    if (location.firstElementChild) {
+        location.firstElementChild.remove();
     }
 }
